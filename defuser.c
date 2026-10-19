@@ -19,37 +19,35 @@ static int write_answer(char *out, size_t cap, const uint32_t *values, size_t co
     return count == 0;
 }
 
-uint32_t p1_step2(uint32_t a,uint32_t b){
-    uint32_t eax=a+b*8;
-    eax=eax^0xf153;
-    return eax;
-}
-uint32_t p1_step0(uint32_t a,uint32_t b){
-    uint32_t eax=a*3;
-    uint32_t esi=b+0x82c3;
-    eax=eax^esi;
-    return eax;
-}
-uint32_t p1_step1(uint32_t a,uint32_t b){
-    uint32_t tmp=b^0x310b;
-    uint32_t eax=tmp+a*4;
-    return eax;
-}
-int solve_phase_1(uint64_t challenge, char *out, size_t cap) {
-    uint32_t high32=(uint32_t)(challenge>>32);
-    uint32_t low32=(uint32_t)(challenge&0xFFFFFFFF);
-    uint32_t mid16=(uint32_t)((challenge>>16)&0xFFFF);
 
-    uint32_t s2=p1_step2(high32,low32);
-    uint32_t s0=p1_step0(low32,mid16);
-    uint32_t ans=p1_step1(s0,s2);
+static uint32_t p1_step2(uint32_t a, uint32_t b){
+    return (a + b * 8) ^ 0xf153;
+}
+
+static uint32_t p1_step0(uint32_t a, uint32_t b){
+    return (a * 3) ^ (b + 0x82c3);
+}
+
+static uint32_t p1_step1(uint32_t a, uint32_t b){
+    return (b ^ 0x310b) + a * 4;
+}
+
+int solve_phase_1(uint64_t challenge, char *out, size_t cap) {
+    uint32_t high32 = (uint32_t)(challenge >> 32);
+    uint32_t low32  = (uint32_t)(challenge & 0xFFFFFFFF);
+    uint32_t shift16 = (uint32_t)(challenge >> 16); 
+
+    uint32_t res_step2 = p1_step2(high32, low32);
+    uint32_t res_step0 = p1_step0(low32, shift16);
+    uint32_t ans = p1_step1(res_step0, res_step2);
 
     uint32_t values[MAX_FIELDS] = {0};
     size_t count = 0;
-    values[0]=ans;
-    count=1;
+    values[0] = ans;
+    count = 1;
     return write_answer(out, cap, values, count);
 }
+
 
 
 int solve_phase_2(uint64_t challenge, char *out, size_t cap) {
