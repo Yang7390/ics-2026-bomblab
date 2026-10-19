@@ -20,9 +20,34 @@ static int write_answer(char *out, size_t cap, const uint32_t *values, size_t co
 }
 
 int solve_phase_1(uint64_t challenge, char *out, size_t cap) {
+    uint32_t p1_step2(uint32_t a,uint32_t b){
+        uint32_t eax=a+b*8;
+        eax=eax^0xf153;
+        return eax;
+    }
+    uint32_t p1_step0(uint32_t a,uint32_t b){
+        uint32_t eax=a*3;
+        uint32_t esi=b+0x82c3;
+        eax=eax^esi;
+        return eax;
+    }
+    uint32_t p1_step1(uint32_t a,uint32_t b){
+        uint32_t b=b^0x310b;
+        uint32_t eax=b+a*4;
+        return  eax;
+    }
+    uint32_t high32=(uint32_t)(challenge>>32);
+    unit32_t low32=(uint32_t)(challenge&0xFFFFFFFF);
+    uint32_t mid16=(uint32_t)((challenge>>16)&0xFFFF);
+    
+    uint32_t s2=p1_step2(high32,low32);
+    uint32-t s0=p1_step0(low32,mid16);
+    uint32-t ans=p1_step1(s0,s2);
+    
     uint32_t values[MAX_FIELDS] = {0};
     size_t count = 0;
-    (void)challenge;
+    values[0]=ans;
+    count=1;
     // TODO: 根据 phase_01 的汇编，用 challenge 算出口令中的各个整数，依次存入 values，并把 count 改为整数个数。
     return write_answer(out, cap, values, count);
 }
