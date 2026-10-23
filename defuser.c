@@ -74,14 +74,14 @@ static uint32_t p3_dispatch(uint32_t a,uint32_t b){
         return 0;
     }
     switch(a){
-        case 0:  return (b * 2) ^ 0xb01e;
-        case 1:  return 0x1772 + b * 5;
-        case 2:  return 0x13768 + b * 5;
-        case 3:  return (b * 4) ^ 0x894d;
-        case 4:  return 0x25d6 + b * 3;
-        case 5:  return (b ^ 0x40eb) + (b >> 1);
-        case 6:  return (b ^ 0x7152) + (b >> 1);
-        case 7:  return 0x2ef90 + b * 5;
+        case 0:  return 0x13768 + b * 5;
+        case 1:  return (b * 4) ^ 0x894d;
+        case 2:  return 0x25d6 + b * 3;
+        case 3:  return (b ^ 0x40eb) + (b >> 1);
+        case 4:  return (b ^ 0x7152) + (b >> 1);
+        case 5:  return 0x2ef90 + b * 5;
+        case 6:  return (b * 2) ^ 0xb01e;
+        case 7:  return 0x1772 + b * 5;
         default: return 0;
     }
 }             
