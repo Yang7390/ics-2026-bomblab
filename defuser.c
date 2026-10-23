@@ -99,7 +99,7 @@ int solve_phase_3(uint64_t challenge, char *out, size_t cap) {
     size_t count = 2;
     uint32_t num1=challenge & 0x7;
     uint32_t val=(challenge >> 3)^(challenge >>32);
-    uint32_t num2=p3_dispatch(num1,val)
+    uint32_t num2=p3_dispatch(num1,val);
     values[0]=num1;
     values[1]=num2;
     return write_answer(out, cap, values, count);
