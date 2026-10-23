@@ -74,31 +74,22 @@ static uint32_t p3_dispatch(uint32_t a,uint32_t b){
         return 0;
     }
     switch(a){
-        case 0:
-            return(0x2ef90+b*5);
-        case 1:
-            return(b^0x40eb)+(b>>1);
-        case 2:
-            return(0x1772+b*5);
-        case 3:
-            return((0x0+b*4)^0x894d);
-        case 4:
-            return(0x13768+b*5);
-        case 5:
-            return(b^0x7152)+(b>>1);
-        case 6:
-            return((b*2)^0xb01e);
-        case 7:
-            return(0x25d6+b*3);
-        default:
-            return 0;
+        case 0:  return (b * 2) ^ 0xb01e;
+        case 1:  return 0x1772 + b * 5;
+        case 2:  return 0x13768 + b * 5;
+        case 3:  return (b * 4) ^ 0x894d;
+        case 4:  return 0x25d6 + b * 3;
+        case 5:  return (b ^ 0x40eb) + (b >> 1);
+        case 6:  return (b ^ 0x7152) + (b >> 1);
+        case 7:  return 0x2ef90 + b * 5;
+        default: return 0;
     }
 }             
 int solve_phase_3(uint64_t challenge, char *out, size_t cap) {
     uint32_t values[MAX_FIELDS] = {0};
     size_t count = 2;
     uint32_t num1=challenge & 0x7;
-    uint32_t val=(challenge >> 3)^(challenge >>32);
+    uint32_t val=(uint32_t)(challenge >> 3)^(uint32_t)(challenge >>32);
     uint32_t num2=p3_dispatch(num1,val);
     values[0]=num1;
     values[1]=num2;
