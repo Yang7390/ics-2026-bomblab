@@ -104,13 +104,13 @@ static p4_walk(uint32_t b,uint32_t c,uint32_t d,uint32_t e){
 	 }
     uint32_t temp=b+e;
     if(a<b){
-    	uint32_t res=return p4_walk(a,a,b-1,d,e);
+    	uint32_t res=p4_walk(a,a,b-1,d,e);
         res=(res*5)^temp;
 	    res^=0x1a;
 	    return res;
 	}
 	else{
-	    uint32_t res=return p4_walk(a,a,c,1+b,e);
+	    uint32_t res=p4_walk(a,a,c,1+b,e);
         res=(res*5)^temp;
         res^=0xa;
         return res;
