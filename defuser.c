@@ -96,41 +96,43 @@ int solve_phase_3(uint64_t challenge, char *out, size_t cap) {
     return write_answer(out, cap, values, count);
 }
 
-static p4_walk(uint32_t b,uint32_t c,uint32_t d,uint32_t e){
- 	uint32_t a=d+(c-d)/2;
- 	if(a==b){
- 		a=(0xf7+b)^e;
- 		return a;
-	 }
-    uint32_t temp=b+e;
-    if(a<b){
-    	uint32_t res=p4_walk(a,a,b-1,d,e);
-        res=(res*5)^temp;
-	    res^=0x1a;
-	    return res;
-	}
-	else{
-	    uint32_t res=p4_walk(a,a,c,1+b,e);
-        res=(res*5)^temp;
-        res^=0xa;
+static uint32_t p4_walk(uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+{
+    uint32_t a = d + (c - d) / 2;
+    if (a == b) {
+        return (0xf7 + a) ^ e;
+    }
+
+    uint32_t temp = a + e;
+    if (a < b) {
+        uint32_t res = p4_walk(b, c, a + 1, e);
+        res = res * 5;
+        res ^=temp;
+        res ^= 0x1a;
+        return res;
+    } else {
+        uint32_t res = p4_walk(b, a - 1, d, e);
+        res = res * 5;
+        res ^= temp;
+        res ^= 0xa;
         return res;
     }
- }
+}
 
 int solve_phase_4(uint64_t challenge, char *out, size_t cap) {
     uint32_t values[MAX_FIELDS] = {0};
-    size_t count = 0;
-    
-    uint32_t high32=(uint32_t)(challenge>>32);
-    uint32_t high57=（uint32_t)(challenge>>7)^high32;
-    uint32_t m=challenge&0x7f;
-    uint32_t n=0x7f;
-    uint32_t t=0;
+    size_t count = 1;
 
-    values[0] = p4_walk(m,n,t,high57);
-    count = 1;
+    uint32_t high32 = (uint32_t)(challenge >> 32);
+    uint32_t high57 = (uint32_t)(challenge >> 7) ^ high32;
+    uint32_t m = challenge & 0x7f;
+    uint32_t n = 0x7f;
+    uint32_t t = 0;
+
+    values[0] = p4_walk(m, n, t, high57);
     return write_answer(out, cap, values, count);
 }
+
 
 int solve_phase_5(uint64_t challenge, char *out, size_t cap) {
     uint32_t values[MAX_FIELDS] = {0};
