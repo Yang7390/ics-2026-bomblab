@@ -133,12 +133,48 @@ int solve_phase_4(uint64_t challenge, char *out, size_t cap) {
     return write_answer(out, cap, values, count);
 }
 
+struct Node {
+    struct Node* next;
+    uint32_t val1;
+    uint32_t val2;
+};
+extern struct Node* node_array[8];
+
+static uint32_t p5_walk(uint64_t val, uint32_t *out)
+{
+    uint32_t idx = val & 0x7;
+    uint32_t steps = (val >> 3) & 0x3;
+    struct Node* cur = node_array[idx];
+
+    uint32_t check = (uint32_t)(val >> 6);
+    check ^= (uint32_t)(val >> 32);
+    check ^= 0xeb6;
+
+    check = check * 3 + cur->val2;
+    uint32_t v1 = cur->val1;
+    check ^= v1;
+    *out = v1;
+
+    for (uint32_t i = 0; i < steps; i++) {
+        cur = cur->next;
+        check = check * 3 + cur->val2;
+        v1 = cur->val1;
+        check ^= v1;
+        *out = v1;
+    }
+    return check;
+}
 
 int solve_phase_5(uint64_t challenge, char *out, size_t cap) {
     uint32_t values[MAX_FIELDS] = {0};
-    size_t count = 0;
-    (void)challenge;
-    // TODO: 根据 phase_05 的汇编，用 challenge 算出口令中的各个整数，依次存入 values，并把 count 改为整数个数。
+    size_t count = 2;
+
+    uint32_t last_val;
+    uint32_t check = p5_walk(challenge, &last_val);
+
+    values[0] = check;
+    values[1] = last_val;
+
     return write_answer(out, cap, values, count);
 }
 
