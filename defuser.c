@@ -133,50 +133,93 @@ int solve_phase_4(uint64_t challenge, char *out, size_t cap) {
     return write_answer(out, cap, values, count);
 }
 
+
+typedef struct Node Node;
 struct Node {
-    struct Node* next;
+    Node* next;
     uint32_t val1;
     uint32_t val2;
 };
-extern struct Node* node_array[8];
 
-static uint32_t p5_walk(uint64_t val, uint32_t *out)
+static Node n0 = {NULL, 0xa40, 0xba3d};
+static Node n1 = {NULL, 0x753, 0x7873};
+static Node n2 = {NULL, 0x814, 0xb146};
+static Node n3 = {NULL, 0x543, 0xb816};
+static Node n4 = {NULL, 0x7c,  0xc4c3};
+static Node n5 = {NULL, 0x97c, 0xdbf0};
+static Node n6 = {NULL, 0x30f, 0xa0a9};
+static Node n7 = {NULL, 0xb14, 0x2e93};
+
+static void build_link(void)
 {
-    uint32_t idx = val & 0x7;
-    uint32_t steps = (val >> 3) & 0x3;
-    struct Node* cur = node_array[idx];
+    n0.next = &n1;
+    n1.next = &n2;
+    n2.next = &n3;
+    n3.next = &n4;
+    n4.next = &n5;
+    n5.next = &n6;
+    n6.next = &n7;
+    n7.next = NULL;
+}
 
-    uint32_t check = (uint32_t)(val >> 6);
-    check ^= (uint32_t)(val >> 32);
-    check ^= 0xeb6;
+static Node* const p5_heads[8] = {
+    &n0,
+    &n1,
+    &n2,
+    &n3,
+    &n4,
+    &n5,
+    &n6,
+    &n7,
+};
 
-    check = check * 3 + cur->val2;
-    uint32_t v1 = cur->val1;
-    check ^= v1;
-    *out = v1;
+static uint32_t p5_traverse(uint64_t challenge, uint32_t *out_last_val)
+{
+    uint32_t idx   = challenge & 0x7U;
+    uint32_t steps = (challenge >> 3) & 0x3U;
 
-    for (uint32_t i = 0; i < steps; i++) {
-        cur = cur->next;
-        check = check * 3 + cur->val2;
-        v1 = cur->val1;
-        check ^= v1;
-        *out = v1;
+    Node *p = p5_heads[idx];
+
+
+    uint32_t check = ( (challenge >> 6) & 0xFFFFFFFFU )
+                   ^ ( (challenge >> 32) & 0xFFFFFFFFU )
+                   ^ 0xeb6U;
+
+
+    check = check * 3 + p->val2;
+    *out_last_val = p->val1;
+    check ^= p->val1;
+
+    if (steps == 0) {
+        return check;
+    }
+
+
+    uint32_t i = 1;
+    while (1)
+    {
+        p = p->next;
+        check = check * 3 + p->val2;
+        *out_last_val = p->val1;
+        check ^= p->val1;
+
+        if (i >= steps)
+            break;
+        i++;
     }
     return check;
 }
 
-int solve_phase_5(uint64_t challenge, char *out, size_t cap) {
-    uint32_t values[MAX_FIELDS] = {0};
-    size_t count = 2;
+int solve_phase_5(uint64_t challenge, char *out, size_t cap)
+{
+    build_link();
+    uint32_t ans1, ans2;
+    ans1 = p5_traverse(challenge, &ans2);
 
-    uint32_t last_val;
-    uint32_t check = p5_walk(challenge, &last_val);
-
-    values[0] = check;
-    values[1] = last_val;
-
-    return write_answer(out, cap, values, count);
+    uint32_t vals[2] = {ans1, ans2};
+    return write_answer(out, cap, vals, 2);
 }
+
 
 int solve_phase_6(uint64_t challenge, char *out, size_t cap) {
     uint32_t values[MAX_FIELDS] = {0};
