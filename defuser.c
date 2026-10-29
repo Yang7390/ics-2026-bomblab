@@ -220,7 +220,6 @@ int solve_phase_5(uint64_t challenge, char *out, size_t cap)
     return write_answer(out, cap, vals, 2);
 }
 
-
 static inline uint32_t rol32(uint32_t x, int n) {
     return (x << n) | (x >> (32 - n));
 }
@@ -285,17 +284,11 @@ static uint32_t p6_calc(uint64_t challenge)
 int solve_phase_6(uint64_t challenge, char *out, size_t cap)
 {
     uint32_t values[MAX_FIELDS] = {0};
-    size_t count = 2;
+    size_t count = 1;
 
-    uint32_t idx1 = challenge & 0x7;
-    uint32_t idx2 = (challenge >> 3) & 0x7;
-
-    values[0] = idx1;
-    values[1] = idx2;
-
+    values[0] = p6_calc(challenge);
     return write_answer(out, cap, values, count);
 }
-
 
 
 int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap) {
