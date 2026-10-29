@@ -262,7 +262,7 @@ static uint32_t op5(uint32_t x) {
 }
 
 static uint32_t (*op_table[8])(uint32_t) = {
-    op0, op1, op2, op3, op4, op5, op1, op4
+    op2, op4, op0, op3, op5, op0, op1, op4
 };
 
 static uint32_t p6_calc(uint64_t challenge)
