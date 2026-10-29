@@ -267,9 +267,7 @@ static uint32_t (*op_table[8])(uint32_t) = {
 
 static uint32_t p6_calc(uint64_t challenge)
 {
-    uint32_t lo = (uint32_t)challenge;
-    uint32_t hi = (uint32_t)(challenge >> 32);
-    uint32_t x0 = (lo ^ hi) >> 6;
+    uint32_t x0 = (uint32_t)((challenge >> 6) ^ (challenge >> 32));
 
     int idx1 = challenge & 0x7;
     int idx2 = (challenge & 0x38) >> 3;
