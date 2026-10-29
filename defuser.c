@@ -221,13 +221,82 @@ int solve_phase_5(uint64_t challenge, char *out, size_t cap)
 }
 
 
-int solve_phase_6(uint64_t challenge, char *out, size_t cap) {
+static inline uint32_t rol32(uint32_t x, int n) {
+    return (x << n) | (x >> (32 - n));
+}
+static inline uint32_t ror32(uint32_t x, int n) {
+    return (x >> n) | (x << (32 - n));
+}
+
+static uint32_t op0(uint32_t x) {
+    uint32_t rax = x ^ 0xdad3;
+    rax = rax + x * 4;
+    return rax;
+}
+static uint32_t op1(uint32_t x) {
+    uint32_t rax = rol32(x, 3);
+    rax ^= 0xfac;
+    return rax;
+}
+static uint32_t op2(uint32_t x) {
+    uint32_t rdx = x * 4;
+    uint32_t eax = rdx + 0x6dc0;
+    rdx += x;
+    eax ^= rdx;
+    return eax;
+}
+static uint32_t op3(uint32_t x) {
+    uint32_t rax = x >> 1;
+    rax ^= x;
+    rax += 0x23db;
+    return rax;
+}
+static uint32_t op4(uint32_t x) {
+    uint32_t eax = x + 0x8c30;
+    uint32_t edi = x >> 3;
+    eax ^= edi;
+    return eax;
+}
+static uint32_t op5(uint32_t x) {
+    uint32_t rax = ror32(x, 7);
+    return rax;
+}
+
+static uint32_t (*op_table[8])(uint32_t) = {
+    op0, op1, op2, op3, op4, op5, op1, op4
+};
+
+static uint32_t p6_calc(uint64_t challenge)
+{
+    uint32_t lo = (uint32_t)challenge;
+    uint32_t hi = (uint32_t)(challenge >> 32);
+    uint32_t x0 = (lo ^ hi) >> 6;
+
+    int idx1 = challenge & 0x7;
+    int idx2 = (challenge & 0x38) >> 3;
+
+    uint32_t r1 = op_table[idx1](x0);
+    uint32_t r2 = r1 ^ 0x1940;
+    uint32_t r3 = op_table[idx2](r2);
+    uint32_t final = r3 + 0x838;
+    return final;
+}
+
+int solve_phase_6(uint64_t challenge, char *out, size_t cap)
+{
     uint32_t values[MAX_FIELDS] = {0};
-    size_t count = 0;
-    (void)challenge;
-    // TODO: 根据 phase_06 的汇编，用 challenge 算出口令中的各个整数，依次存入 values，并把 count 改为整数个数。
+    size_t count = 2;
+
+    uint32_t idx1 = challenge & 0x7;
+    uint32_t idx2 = (challenge >> 3) & 0x7;
+
+    values[0] = idx1;
+    values[1] = idx2;
+
     return write_answer(out, cap, values, count);
 }
+
+
 
 int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap) {
     (void)challenge;
