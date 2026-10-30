@@ -296,7 +296,7 @@ static uint32_t secret_mix(uint32_t x)
 
 int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap)
 {
-
+    // r12 = context, r13 = challenge
     uint32_t c   = challenge & 0x3;
     uint32_t x   = (uint32_t)(context >> 32) ^ (uint32_t)context;
     uint32_t y   = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
@@ -310,8 +310,7 @@ int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap)
     uint32_t edx = y + c + 0xd9ed + (x >> 1);
     uint32_t v3 = v2 ^ edx;
 
-
+    // 精确32字节空格填充，OPEN正好落在缓冲区偏移32字节处，匹配魔数校验
     snprintf(out, cap, "%32sOPEN %u %u %u", "", v1, v2, v3);
     return 0;
 }
-
