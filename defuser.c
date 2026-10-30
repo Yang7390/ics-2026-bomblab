@@ -297,21 +297,19 @@ static uint32_t secret_mix(uint32_t x)
 
 int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap)
 {
-    uint32_t v1 = (uint32_t)(challenge & 0x3);
-
-    uint32_t x = (uint32_t)(context >> 32) ^ (uint32_t)context;
-    uint32_t y = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
-    uint32_t b16 = (uint32_t)(challenge >> 16);
-    uint32_t r9 = (v1 * 0xd597u) ^ b16;
+   
+    uint32_t v1 = (uint32_t)(context & 0x3);
+    uint32_t x = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
+    uint32_t y = (uint32_t)(context >> 32) ^ (uint32_t)context;
+    uint32_t r9 = (v1 * 0xd597u) ^ (uint32_t)(context >> 16);
 
     uint32_t v2 = secret_mix(x ^ y) ^ r9;
     uint32_t edx = y + v1 + 0xd9edu + (x >> 1);
     uint32_t v3 = v2 ^ edx;
 
-    int n = snprintf(out, cap, "%32sOPEN %u %u %u", "", v1, v2, v3);
-    if (n < 0 || (size_t)n >= cap) {
-        return 1;
-    }
+   
+    snprintf(out, cap, "%32sOPEN%u %u %u", "", v1, v2, v3);
 
-    return 0;
+    return 0; 
 }
+   
