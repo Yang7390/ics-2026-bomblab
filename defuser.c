@@ -293,24 +293,29 @@ static uint32_t secret_mix(uint32_t x)
     uint32_t rol1 = (x << 1) | (x >> 31);
     return (rol1 + 0xd597) ^ 0xd9ed;
 }
-
 int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap)
 {
-    // r12 = context, r13 = challenge
-    uint32_t c   = challenge & 0x3;
-    uint32_t x   = (uint32_t)(context >> 32) ^ (uint32_t)context;
-    uint32_t y   = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
+
+    uint32_t c = challenge & 0x3;
+
+
+    uint32_t x = (uint32_t)(context >> 32) ^ (uint32_t)context;
+    uint32_t y = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
     uint32_t b16 = (uint32_t)(challenge >> 16);
-    uint32_t r9  = (c * 0xd597) ^ b16;
+    uint32_t r9 = (c * 0xd597) ^ b16;
     uint32_t arg_mix = x ^ y;
 
-    uint32_t v1 = c;
-    uint32_t mix_ret = secret_mix(arg_mix);
+
+    uint32_t rol1 = (arg_mix << 1) | (arg_mix >> 31);
+    uint32_t mix_ret = (rol1 + 0xd597) ^ 0xd9ed;
     uint32_t v2 = mix_ret ^ r9;
+
+
     uint32_t edx = y + c + 0xd9ed + (x >> 1);
     uint32_t v3 = v2 ^ edx;
 
-    // 精确32字节空格填充，OPEN正好落在缓冲区偏移32字节处，匹配魔数校验
-    snprintf(out, cap, "%32sOPEN %u %u %u", "", v1, v2, v3);
+
+    snprintf(out, cap, "                                OPEN %u %u %u", v1, v2, v3);
     return 0;
 }
+
