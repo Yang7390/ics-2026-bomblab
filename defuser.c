@@ -296,11 +296,11 @@ static uint32_t secret_mix(uint32_t x)
 
 int solve_secret(uint64_t challenge, uint64_t context, char *out, size_t cap)
 {
-    uint32_t c = context & 0x3;
+    uint32_t c = challenge & 0x3;
 
-    uint32_t x = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
-    uint32_t y = (uint32_t)(context >> 32) ^ (uint32_t)context;
-    uint32_t b16 = (uint32_t)(context >> 16);
+    uint32_t x = (uint32_t)(context >> 32) ^ (uint32_t)context;
+    uint32_t y = (uint32_t)(challenge >> 32) ^ (uint32_t)challenge;
+    uint32_t b16 = (uint32_t)(challenge >> 16);
     uint32_t r9 = (c * 0xd597) ^ b16;
     uint32_t arg_mix = x ^ y;
 
